@@ -2,9 +2,7 @@ name: Déploiement sous Nginx
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
 
 jobs:
   deploy:
@@ -13,6 +11,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Prépare le dossier cible AVANT le SCP (création + droits)
+      - name: Prepare target dir
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          # passphrase: ${{ secrets.SSH_PASSPHRASE }}  # décommente si ta clé a une passphrase
+          script: |
+            set -e
+            sudo mkdir -p /var/www/app
+            sudo chown -R $USER:$USER /var/www/app
+            # sanity check d'écriture
+            echo ok > /var/www/app/.writetest && rm -f /var/www/app/.writetest
+
+      # Copie des fichiers (glob récursif + strip du dossier public/)
       - name: Copier les fichiers via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -20,9 +35,14 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "./public/*"
+          source: "public/**"
           target: "/var/www/app"
+          strip_components: 1
+          overwrite: true
+          debug: true
+          timeout: 10m
 
+      # Install + vhost Nginx puis restart
       - name: Provision Nginx (SSH)
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -32,10 +52,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            sudo apt-get update -y
-            sudo apt-get install -y nginx
-            sudo mkdir -p /var/www/app
-            sudo chown -R $USER:$USER /var/www/app
+            sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
             sudo tee /etc/nginx/sites-available/app > /dev/null <<'EOF'
             server {
               listen 80;
@@ -46,5 +64,8 @@ jobs:
             }
             EOF
             sudo ln -sf /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app
+            if [ -e /etc/nginx/sites-enabled/default ]; then
+              sudo rm -f /etc/nginx/sites-enabled/default
+            fi
             sudo nginx -t
             sudo systemctl restart nginx
