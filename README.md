@@ -27,7 +27,7 @@ Arborescence
 ## ⚙️ Workflows
 
 ### 1) Appli 1 — `deploy.yml` (SSH → Nginx)
-
+```
 **Pipeline :**
 1. Prépare la cible `/var/www/app` **avant** la copie (création + droits).
 2. Copie `public/**` sur le serveur (SCP), en déposant le **contenu** dans `/var/www/app`.
@@ -40,7 +40,7 @@ Arborescence
 - `SSH_PRIVATE_KEY` : clé privée OpenSSH
 
 **Host Nginx appliqué :**
-```nginx
+nginx
 server {
   listen 80;
   server_name _;
@@ -48,10 +48,11 @@ server {
   index index.html;
   location / { try_files $uri $uri/ =404; }
 }
-
+```
 
 2) Appli 2 — lamp-ci.yml
 
+```
 Objectif minimal demandé : mettre l’appli 2 en accès téléchargement via un Docker Registry.
 Ici : retag de l’image WordPress officielle + smoke test + push Docker Hub.
 
@@ -67,3 +68,4 @@ Secrets utilisés :
 DOCKER_HUB_USERNAME
 DOCKER_HUB_ACCESS_TOKEN
 DOCKER_IMAGE
+```
