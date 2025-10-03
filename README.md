@@ -101,7 +101,7 @@ Une sécurité a bien été mise en place du coté SSH et n'autorise une connexi
 
 Le problème que j'ai eu est dû a mes machines virtuelles ayant un réseau très faible en accès par pont pour une raison que j'ignore mais fonctionne très bien par le nat ou en privé, j'ai donc opté sur la solution du nat pour pallier a mon problème
 
-## Livrable : 
+## Livrable
 
 URL publique du site (appli 1) : http://90.25.253.205
 
