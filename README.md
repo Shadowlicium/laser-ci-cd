@@ -78,8 +78,29 @@ Commande pour pull le conteneur
 
 docker pull shadowlicium/wordpress-ci:tagname
 
+Les secrets mise en place pour l'accès a mon DockerHub
+
 | Secret                         | Rôle                 |
 | ------------------------------ | -------------------- | 
 | `DOCKER_HUB_USERNAME`          | Login Docker Hub     |
 | `DOCKER_HUB_ACCESS_TOKEN`      | PAT Docker Hub       |
 | `DOCKER_IMAGE`                 | Repo/Tag cible       |
+
+## L'exposition
+
+La machine virtuelle est exposé depuis un réseau NAT avec plusieurs ouverture de port via Virtualbox
+
+HTTP : Host 80 ➜ Guest 10.0.2.15:80
+
+SSH : Host 22 ➜ Guest 10.0.2.15:22
+
+Ainsi que part ma box internet
+
+
+Livebox (WAN → PC hôte) :
+
+HTTP : WAN 80 ➜ LAN 80 (PC hôte)
+
+SSH : WAN 22 ➜ LAN 22 (PC hôte)
+
+`Le site est disponible sur http://90.25.253.205`
