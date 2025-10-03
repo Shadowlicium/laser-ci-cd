@@ -1,0 +1,133 @@
+name: CI/CD LAMP
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  ci-cd:
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_DOCKER_CLI_BUILD: 1
+      DOCKER_BUILDKIT: 1
+      # Nom d'image NON sensible -> pas en secret
+      IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/wordpress-ci
+      IMAGE_TAG: latest
+
+    steps:
+      - name: Vérification du code
+        uses: actions/checkout@v4
+
+      - name: Préparer .env (depuis les secrets)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .env <<EOF
+          WP_DB_USER=${{ secrets.WP_DB_USER }}
+          WP_DB_PASSWORD=${{ secrets.WP_DB_PASSWORD }}
+          WP_DB_NAME=${{ secrets.WP_DB_NAME }}
+          MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          EOF
+
+      - name: Créer docker-compose.yml
+        run: |
+          cat > docker-compose.yml <<'EOF'
+          version: '3.8'
+          services:
+            db:
+              image: mysql:8.0
+              environment:
+                MYSQL_DATABASE: ${WP_DB_NAME}
+                MYSQL_USER: ${WP_DB_USER}
+                MYSQL_PASSWORD: ${WP_DB_PASSWORD}
+                MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+              ports:
+                - "3306:3306"
+              healthcheck:
+                test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u${WP_DB_USER}", "-p${WP_DB_PASSWORD}"]
+                interval: 5s
+                retries: 20
+
+            wordpress:
+              image: wordpress:latest
+              depends_on:
+                db:
+                  condition: service_healthy
+              ports:
+                - "8080:80"
+              environment:
+                WORDPRESS_DB_HOST: db:3306
+                WORDPRESS_DB_USER: ${WP_DB_USER}
+                WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
+                WORDPRESS_DB_NAME: ${WP_DB_NAME}
+
+            adminer:
+              image: adminer
+              ports:
+                - "8081:8080"
+          EOF
+
+      - name: Lancer Docker Compose
+        run: docker compose up -d
+
+      - name: Attendre MySQL prêt
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in {1..24}; do
+            mysql_user="$(grep '^WP_DB_USER=' .env | cut -d= -f2)"
+            mysql_pass="$(grep '^WP_DB_PASSWORD=' .env | cut -d= -f2)"
+            if docker compose exec -T db mysql -h127.0.0.1 -u"${mysql_user}" -p"${mysql_pass}" -e "SELECT 1" >/dev/null 2>&1; then
+              echo "MySQL OK"; break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+
+      - name: Attendre WordPress prêt
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in {1..24}; do
+            if curl -fsS http://localhost:8080/ >/dev/null; then
+              echo "WordPress is up!"
+              exit 0
+            fi
+            echo "Waiting for WordPress..."
+            sleep 5
+          done
+          echo "WordPress did not start in time"
+          exit 1
+
+      - name: Tests (DB)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mysql_user="$(grep '^WP_DB_USER=' .env | cut -d= -f2)"
+          mysql_pass="$(grep '^WP_DB_PASSWORD=' .env | cut -d= -f2)"
+          docker compose exec -T db mysql -u"${mysql_user}" -p"${mysql_pass}" -e "SHOW DATABASES;" >/dev/null
+
+      # Si tu veux juste re-tagger l'image officielle WordPress dans TON namespace
+      - name: Tag de l'image WordPress
+        run: |
+          set -euo pipefail
+          docker pull wordpress:latest
+          docker tag wordpress:latest "${IMAGE_NAME}:${IMAGE_TAG}"
+
+      - name: Connexion à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Push de l'image
+        run: |
+          set -euo pipefail
+          docker push "${IMAGE_NAME}:${IMAGE_TAG}"
+
+      - name: Nettoyage
+        if: always()
+        run: |
+          docker compose down -v
+          rm -f .env
