@@ -77,3 +77,9 @@ https://hub.docker.com/repository/docker/shadowlicium/wordpress-ci/general
 Commande pour pull le conteneur
 
 docker pull shadowlicium/wordpress-ci:tagname
+
+| Secret                         | Rôle                 |
+| ------------------------------ | -------------------- | 
+| `DOCKER_HUB_USERNAME`          | Login Docker Hub     |
+| `DOCKER_HUB_ACCESS_TOKEN`      | PAT Docker Hub       |
+| `DOCKER_IMAGE`                 | Repo/Tag cible       |
