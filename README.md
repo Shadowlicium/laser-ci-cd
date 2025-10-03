@@ -51,7 +51,7 @@ server {
 }
 ```
 
-2) Appli 2 — `lamp-ci.yml`
+2) Appli 2 — `dep-stack.yml`
 
 ```
 Objectif minimal demandé : mettre l’appli 2 en accès téléchargement via un Docker Registry.
