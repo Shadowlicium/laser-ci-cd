@@ -11,6 +11,7 @@ Appli 2 – Mise à disposition d’une image sur Docker Hub (retag/push de l’
 Hébergement : la VM (Nginx). GitHub stocke le code et exécute le CI/CD ; le job SCP copie les fichiers du dépôt vers /var/www/app sur la Machine Virtuelle.
 
 Arborescence
+```
 .
 ├─ .github/
 │  └─ workflows/
@@ -19,7 +20,7 @@ Arborescence
 ├─ public/
 │  └─ index.html          # Le site statique à déployer
 └─ README.md
-
+```
 
 
 ---
