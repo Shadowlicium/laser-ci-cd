@@ -16,7 +16,7 @@ Arborescence
 ├─ .github/
 │  └─ workflows/
 │     ├─ deploy.yml       # Appli 1 : déploiement HTML via SSH/Nginx
-│     └─ lamp-ci.yml      # Appli 2 : retag/push image sur Docker Hub
+│     └─ dep-stack.yml      # Appli 2 : retag/push image sur Docker Hub
 ├─ public/
 │  └─ index.html          # Le site statique à déployer
 └─ README.md
