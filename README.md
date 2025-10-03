@@ -70,14 +70,6 @@ DOCKER_HUB_USERNAME
 DOCKER_HUB_ACCESS_TOKEN
 DOCKER_IMAGE
 ```
-Lien du Dockerhub pour télécharger l'image :
-
-https://hub.docker.com/repository/docker/shadowlicium/wordpress-ci/general
-
-Commande pour pull le conteneur
-
-docker pull shadowlicium/wordpress-ci:tagname
-
 Les secrets mise en place pour l'accès a mon DockerHub
 
 | Secret                         | Rôle                 |
@@ -103,4 +95,16 @@ HTTP : WAN 80 ➜ LAN 80 (PC hôte)
 
 SSH : WAN 22 ➜ LAN 22 (PC hôte)
 
-`Le site est disponible sur http://90.25.253.205`
+Une sécurité a bien été mise en place du coté SSH et n'autorise une connexion que via une clé SSH.
+
+## Problème rencontré
+
+Le problème que j'ai eu est dû a mes machines virtuelles ayant un réseau très faible en accès par pont pour une raison que j'ignore mais fonctionne très bien par le nat ou en privé, j'ai donc opté sur la solution du nat pour pallier a mon problème
+
+Livrable : 
+
+URL publique du site (appli 1) : http://90.25.253.205
+Lien Docker Hub (appli 2) : https://hub.docker.com/repository/docker/shadowlicium/wordpress-ci/
+Ainsi que le fonctionnement des workflows.
+<img width="1273" height="164" alt="image" src="https://github.com/user-attachments/assets/f2a00d69-d07c-45ce-882d-5240320d1086" />
+
