@@ -54,7 +54,7 @@ server {
 2) Appli 2 — `dep-stack.yml`
 
 ```
-Objectif minimal demandé : mettre l’appli 2 en accès téléchargement via un Docker Registry.
+Objectif demandé : mettre l’appli 2 en accès téléchargement via un Docker Registry.
 Ici : retag de l’image WordPress officielle + smoke test + push Docker Hub.
 
 Étapes :
@@ -70,3 +70,10 @@ DOCKER_HUB_USERNAME
 DOCKER_HUB_ACCESS_TOKEN
 DOCKER_IMAGE
 ```
+Lien du Dockerhub pour télécharger l'image :
+
+https://hub.docker.com/repository/docker/shadowlicium/wordpress-ci/general
+
+Commande pour pull le conteneur
+
+docker pull shadowlicium/wordpress-ci:tagname
