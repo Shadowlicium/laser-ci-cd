@@ -6,7 +6,7 @@ Ce dépôt met en place deux pipelines GitHub Actions :
 
 Appli 1 – Déploiement pré-prod d’un site statique sur un serveur public via SSH + Nginx (.github/workflows/deploy.yml).
 
-Appli 2 – Mise à disposition d’une image sur Docker Hub (retag/push de l’image officielle WordPress) (.github/workflows/lamp-ci.yml).
+Appli 2 – Mise à disposition d’une image sur Docker Hub (retag/push de l’image officielle WordPress) (.github/workflows/dep-stack.yml).
 
 Hébergement : la VM (Nginx). GitHub stocke le code et exécute le CI/CD ; le job SCP copie les fichiers du dépôt vers /var/www/app sur la Machine Virtuelle.
 
