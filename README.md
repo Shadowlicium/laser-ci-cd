@@ -51,7 +51,7 @@ server {
 }
 ```
 
-2) Appli 2 — `dep-stack.yml`
+### 2) Appli 2 — `dep-stack.yml`
 
 ```
 Objectif demandé : mettre l’appli 2 en accès téléchargement via un Docker Registry.
