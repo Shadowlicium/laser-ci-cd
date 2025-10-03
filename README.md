@@ -104,7 +104,9 @@ Le problème que j'ai eu est dû a mes machines virtuelles ayant un réseau trè
 Livrable : 
 
 URL publique du site (appli 1) : http://90.25.253.205
+
 Lien Docker Hub (appli 2) : https://hub.docker.com/repository/docker/shadowlicium/wordpress-ci/
+
 Ainsi que le fonctionnement des workflows.
 <img width="1273" height="164" alt="image" src="https://github.com/user-attachments/assets/f2a00d69-d07c-45ce-882d-5240320d1086" />
 
